@@ -11,6 +11,7 @@ export const resourcesService = {
             college: string;
             uploaderId: string;
             uploaderName: string;
+            uploaderAvatar?: string;
             type: ResourceType;
             year: string;
             tags: string[];
@@ -45,6 +46,7 @@ export const resourcesService = {
                     college: metadata.college,
                     uploader_id: metadata.uploaderId,
                     uploader_name: metadata.uploaderName,
+                    uploader_avatar: metadata.uploaderAvatar,
                     type: metadata.type,
                     year: metadata.year,
                     tags: metadata.tags,
@@ -78,8 +80,9 @@ export const resourcesService = {
         if (error) throw error;
         return data.map((item: any) => ({
             ...item,
-            uploaderId: item.uploader_id, // Map snake_case to camelCase
+            uploaderId: item.uploader_id,
             uploaderName: item.uploader_name,
+            uploaderAvatar: item.uploader_avatar,
             fileUrl: item.file_url,
             fileName: item.file_name,
             fileSize: item.file_size,
@@ -100,6 +103,7 @@ export const resourcesService = {
             ...item,
             uploaderId: item.uploader_id,
             uploaderName: item.uploader_name,
+            uploaderAvatar: item.uploader_avatar,
             fileUrl: item.file_url,
             fileName: item.file_name,
             fileSize: item.file_size,
@@ -109,6 +113,7 @@ export const resourcesService = {
     },
 
     deleteResource: async (resourceId: string, fileUrl: string) => {
+        // ... (delete logic unchanged)
         // 1. Delete from Storage
         // Extract path from URL: .../resources/userId/filename
         const path = fileUrl.split('/resources/')[1];
@@ -127,5 +132,180 @@ export const resourcesService = {
             .eq('id', resourceId);
 
         if (error) throw error;
+    },
+
+    updateResource: async (
+        id: string,
+        updates: Partial<{
+            title: string;
+            subject: string;
+            semester: string;
+            type: ResourceType;
+            year: string;
+            description: string;
+            privacy: Privacy;
+            tags: string[];
+        }>
+    ) => {
+        const { error } = await supabase
+            .from('resources')
+            .update(updates)
+            .eq('id', id);
+
+        if (error) throw error;
+    },
+
+    getAccessibleResources: async (
+        userCollege: string,
+        filters?: {
+            search?: string;
+            semester?: string;
+            type?: string;
+            branch?: string;
+            year?: string;
+            privacy?: string;
+            sortBy?: 'latest' | 'oldest' | 'rating' | 'downloads';
+        }
+    ) => {
+        let query = supabase
+            .from('resources')
+            .select('*');
+
+        // 1. Privacy & Access Control Logic
+        // Public resources OR (Private AND same college)
+        query = query.or(`privacy.eq.Public,and(privacy.eq.Private,college.eq."${userCollege}")`);
+
+        // 2. Search (Title, Subject, Description, Tags)
+        if (filters?.search) {
+            query = query.or(`title.ilike.%${filters.search}%,subject.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+        }
+
+        // 3. Filters
+        if (filters?.semester && filters.semester !== 'All') {
+            query = query.eq('semester', filters.semester);
+        }
+
+        if (filters?.type && filters.type !== 'All') {
+            query = query.eq('type', filters.type);
+        }
+
+        if (filters?.branch && filters.branch !== 'All') {
+            query = query.ilike('subject', `%${filters.branch}%`);
+        }
+
+        if (filters?.year && filters.year !== 'All') {
+            query = query.eq('year', filters.year);
+        }
+
+        if (filters?.privacy && filters.privacy !== 'All') {
+            query = query.eq('privacy', filters.privacy);
+        }
+
+        // 4. Sorting
+        switch (filters?.sortBy) {
+            case 'oldest':
+                query = query.order('upload_date', { ascending: true });
+                break;
+            case 'rating':
+                query = query.order('average_rating', { ascending: false });
+                break;
+            case 'downloads':
+                query = query.order('downloads', { ascending: false });
+                break;
+            case 'latest':
+            default:
+                query = query.order('upload_date', { ascending: false });
+                break;
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        return data.map((item: any) => ({
+            ...item,
+            uploaderId: item.uploader_id,
+            uploaderName: item.uploader_name,
+            uploaderAvatar: item.uploader_avatar,
+            fileUrl: item.file_url,
+            fileName: item.file_name,
+            fileSize: item.file_size,
+            uploadDate: item.upload_date,
+            averageRating: item.average_rating
+        })) as Resource[];
+    },
+
+    getResourceById: async (id: string) => {
+        // Fetch resource and its reviews
+        const { data, error } = await supabase
+            .from('resources')
+            .select(`
+                *,
+                reviews (
+                    id,
+                    user_id,
+                    user_name,
+                    user_avatar,
+                    rating,
+                    comment,
+                    created_at
+                )
+            `)
+            .eq('id', id)
+            .single();
+
+        if (error) throw error;
+
+        const reviews = (data.reviews || []).map((r: any) => ({
+            id: r.id,
+            userId: r.user_id,
+            userName: r.user_name,
+            userAvatar: r.user_avatar,
+            rating: r.rating,
+            comment: r.comment,
+            createdAt: new Date(r.created_at).toLocaleDateString()
+        }));
+
+        return {
+            ...data,
+            uploaderId: data.uploader_id,
+            uploaderName: data.uploader_name,
+            uploaderAvatar: data.uploader_avatar,
+            fileUrl: data.file_url,
+            fileName: data.file_name,
+            fileSize: data.file_size,
+            uploadDate: data.upload_date,
+            averageRating: data.average_rating,
+            reviews: reviews
+        } as Resource;
+    },
+
+    addReview: async (resourceId: string, review: { userId: string, userName: string, userAvatar?: string, rating: number, comment: string }) => {
+        const { data, error } = await supabase
+            .from('reviews')
+            .insert([
+                {
+                    resource_id: resourceId,
+                    user_id: review.userId,
+                    user_name: review.userName,
+                    user_avatar: review.userAvatar,
+                    rating: review.rating,
+                    comment: review.comment
+                }
+            ])
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return {
+            id: data.id,
+            userId: data.user_id,
+            userName: data.user_name,
+            userAvatar: data.user_avatar,
+            rating: data.rating,
+            comment: data.comment,
+            createdAt: new Date(data.created_at).toLocaleDateString()
+        };
     }
 };

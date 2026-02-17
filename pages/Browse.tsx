@@ -1,35 +1,60 @@
 
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/mockApi';
+import { resourcesService } from '../services/resources';
+import { useAuth } from '../context/AuthContext';
 import { Resource, ResourceType } from '../types';
 import ResourceCard from '../components/ResourceCard';
 import { Search, Filter, SlidersHorizontal, RotateCcw, ChevronDown } from 'lucide-react';
 
 const Browse: React.FC = () => {
+  const { user, isAuthenticated } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     semester: 'All',
     type: 'All',
-    branch: 'All'
+    branch: 'All',
+    year: 'All',
+    privacy: 'All'
   });
+  const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'rating' | 'downloads'>('latest');
   const [showFilters, setShowFilters] = useState(false);
 
   const semesters = ['All', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
   const types = ['All', ...Object.values(ResourceType)];
-  const branches = ['All', 'Computer Science', 'Mechanical Engineering', 'Electronics', 'Civil Engineering'];
+  // Updated branches to match Profile options roughly or keep generic
+  const branches = [
+    'All',
+    'Computer Science',
+    'Information Science',
+    'Electronics',
+    'Mechanical',
+    'Civil',
+    'AIML'
+  ];
 
   const fetchFiltered = async () => {
     setLoading(true);
     try {
-      const data = await api.fetchResources({ search: searchTerm, semester: filters.semester });
-      // In a real app, the API would handle all these filters
-      let result = data;
-      if (filters.type !== 'All') result = result.filter(r => r.type === filters.type);
-      if (filters.branch !== 'All') result = result.filter(r => r.subject === filters.branch); // Using subject as branch proxy
-      
-      setResources(result);
+      // If not logged in, maybe only show public? Or require login?
+      // Requirement: System must verify user's college.
+      // If user is guest, user.college is undefined.
+      // Query defaults to Public if college doesn't match string "undefined".
+      // But safer to pass specific logic.
+      const userCollege = user?.college || 'Guest';
+
+      const data = await resourcesService.getAccessibleResources(userCollege, {
+        search: searchTerm,
+        semester: filters.semester,
+        type: filters.type,
+        branch: filters.branch,
+        year: filters.year,
+        privacy: filters.privacy,
+        sortBy: sortBy
+      });
+
+      setResources(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -40,9 +65,9 @@ const Browse: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchFiltered();
-    }, 300);
+    }, 500); // Debounce
     return () => clearTimeout(timer);
-  }, [searchTerm, filters]);
+  }, [searchTerm, filters, sortBy, user?.college]); // Re-fetch if filters or user college changes
 
   const resetFilters = () => {
     setFilters({ semester: 'All', type: 'All', branch: 'All' });
@@ -52,11 +77,14 @@ const Browse: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <h1 className="text-4xl font-bold text-slate-900 font-display">Resource Library</h1>
-        
+        <div>
+          <h1 className="text-4xl font-bold text-slate-900 font-display">Resource Library</h1>
+          {user?.college && <p className="text-slate-500 mt-2">Showing Public resources & Private content from <span className="font-semibold text-indigo-600">{user.college}</span></p>}
+        </div>
+
         <div className="relative flex-1 max-w-xl group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
-          <input 
+          <input
             type="text"
             placeholder="Search by title, subject or tags..."
             className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
@@ -65,7 +93,7 @@ const Browse: React.FC = () => {
           />
         </div>
 
-        <button 
+        <button
           onClick={() => setShowFilters(!showFilters)}
           className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${showFilters ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 border border-slate-200'}`}
         >
@@ -79,21 +107,21 @@ const Browse: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Semester</label>
-              <select 
+              <select
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                 value={filters.semester}
-                onChange={(e) => setFilters({...filters, semester: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, semester: e.target.value })}
               >
                 {semesters.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Resource Type</label>
-              <select 
+              <select
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                 value={filters.type}
-                onChange={(e) => setFilters({...filters, type: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
               >
                 {types.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -101,17 +129,17 @@ const Browse: React.FC = () => {
 
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Branch</label>
-              <select 
+              <select
                 className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
                 value={filters.branch}
-                onChange={(e) => setFilters({...filters, branch: e.target.value})}
+                onChange={(e) => setFilters({ ...filters, branch: e.target.value })}
               >
                 {branches.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
 
             <div className="flex items-end">
-              <button 
+              <button
                 onClick={resetFilters}
                 className="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-indigo-600 font-medium py-2.5"
               >

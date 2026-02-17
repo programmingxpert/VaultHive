@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               branch: session.user.user_metadata.branch || '',
               semester: session.user.user_metadata.semester || '',
               bio: session.user.user_metadata.bio || '',
-              profilePicture: session.user.user_metadata.avatar_url || '/default_profile.jpg',
+              profilePicture: session.user.user_metadata.avatar_url || session.user.user_metadata.profilePicture || '/default_profile.jpg',
               isVerified: session.user.email_confirmed_at ? true : false,
               badges: [],
               stats: {
@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             branch: session.user.user_metadata.branch || '',
             semester: session.user.user_metadata.semester || '',
             bio: session.user.user_metadata.bio || '',
-            profilePicture: session.user.user_metadata.avatar_url || '/default_profile.jpg',
+            profilePicture: session.user.user_metadata.avatar_url || session.user.user_metadata.profilePicture || '/default_profile.jpg',
             isVerified: session.user.email_confirmed_at ? true : false,
             badges: [],
             stats: {
@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           branch: data.session.user.user_metadata.branch || '',
           semester: data.session.user.user_metadata.semester || '',
           bio: data.session.user.user_metadata.bio || '',
-          profilePicture: data.session.user.user_metadata.avatar_url || '/default_profile.jpg',
+          profilePicture: data.session.user.user_metadata.avatar_url || data.session.user.user_metadata.profilePicture || '/default_profile.jpg',
           isVerified: data.session.user.email_confirmed_at ? true : false,
           badges: [],
           stats: {
@@ -179,7 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           branch: responseData.session.user.user_metadata.branch || '',
           semester: responseData.session.user.user_metadata.semester || '',
           bio: responseData.session.user.user_metadata.bio || '',
-          profilePicture: responseData.session.user.user_metadata.avatar_url || '/default_profile.jpg',
+          profilePicture: responseData.session.user.user_metadata.avatar_url || responseData.session.user.user_metadata.profilePicture || '/default_profile.jpg',
           isVerified: responseData.session.user.email_confirmed_at ? true : false,
           badges: [],
           stats: {
@@ -206,15 +206,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUser = async (data: Partial<User>) => {
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { data: { user }, error } = await supabase.auth.updateUser({
         data: data
-      })
+      });
 
       if (error) throw error;
 
-      // Local state update happens via onAuthStateChange automatically or we can force it here if needed, 
-      // but onAuthStateChange is safer. However, for immediate UI feedback we might want to merge.
-      // For now, relying on subscription.
+      if (user) {
+        setState(prev => {
+          if (!prev.user) return prev;
+          return {
+            ...prev,
+            user: {
+              ...prev.user,
+              ...data, // Optimistic update or use returned metadata
+              name: user.user_metadata.name || prev.user.name,
+              college: user.user_metadata.college || prev.user.college,
+              branch: user.user_metadata.branch || prev.user.branch,
+              semester: user.user_metadata.semester || prev.user.semester,
+              bio: user.user_metadata.bio || prev.user.bio,
+              profilePicture: user.user_metadata.avatar_url || prev.user.profilePicture
+            }
+          }
+        });
+      }
+
     } catch (err) {
       throw err;
     }

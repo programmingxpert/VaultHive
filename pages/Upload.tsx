@@ -68,6 +68,7 @@ const UploadPage: React.FC = () => {
           college: user.college,
           uploaderId: user.id,
           uploaderName: user.name,
+          uploaderAvatar: user.profilePicture, // Pass the uploader's avatar
         });
       }
       setSuccess(true);

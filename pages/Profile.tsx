@@ -127,12 +127,28 @@ const Profile: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Branch / Dept</label>
-                <input
-                  type="text"
+                <select
                   className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
                   value={formData.branch}
                   onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                />
+                >
+                  <option value="" disabled>Select Branch</option>
+                  {[
+                    "Computer Science & Engineering (CSE)",
+                    "Information Science & Engineering (ISE)",
+                    "Electronics & Communication Engineering (ECE)",
+                    "Mechanical Engineering (ME)",
+                    "Civil Engineering (CV)",
+                    "Electrical & Electronics Engineering (EEE)",
+                    "Artificial Intelligence & Machine Learning (AIML)",
+                    "Cyber Security",
+                    "Data Science",
+                    "Biotechnology (BT)",
+                    "Aerospace Engineering",
+                    "Chemical Engineering",
+                    "Other"
+                  ].map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Semester</label>
