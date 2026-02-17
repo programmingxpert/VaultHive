@@ -2,7 +2,21 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Mail, Lock, User, GraduationCap, ArrowRight } from 'lucide-react';
+import { Shield, Mail, Lock, User, GraduationCap, ArrowRight, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
+import { passwordSchema, passwordRequirements } from '../utils/validation';
+
+const RequirementItem: React.FC<{ met: boolean; text: string }> = ({ met, text }) => (
+  <div className={`flex items-center gap-2 text-[11px] sm:text-sm transition-all duration-300 ${met ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
+    <div className={`flex-shrink-0 p-0.5 rounded-full transition-all duration-500 ${met ? 'bg-emerald-100 dark:bg-emerald-900/40 rotate-0 scale-110' : 'bg-slate-100 dark:bg-slate-800 -rotate-90 scale-100'}`}>
+      {met ? (
+        <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={3} />
+      ) : (
+        <Circle className="w-3.5 h-3.5" strokeWidth={3} />
+      )}
+    </div>
+    <span className="leading-none">{text}</span>
+  </div>
+);
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +35,15 @@ const Auth: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!isLogin) {
+      const result = passwordSchema.safeParse(password);
+      if (!result.success) {
+        setError(result.error.issues[0].message);
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
       if (isLogin) {
@@ -109,6 +132,34 @@ const Auth: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+
+            {!isLogin && password && (
+              <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl space-y-2 border border-slate-100 dark:border-slate-800">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Password Requirements</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <RequirementItem
+                    met={password.length >= passwordRequirements.minLength}
+                    text={`Min ${passwordRequirements.minLength} characters`}
+                  />
+                  <RequirementItem
+                    met={passwordRequirements.hasUpperCase(password)}
+                    text="Uppercase letter"
+                  />
+                  <RequirementItem
+                    met={passwordRequirements.hasLowerCase(password)}
+                    text="Lowercase letter"
+                  />
+                  <RequirementItem
+                    met={passwordRequirements.hasNumber(password)}
+                    text="Number digit"
+                  />
+                  <RequirementItem
+                    met={passwordRequirements.hasSpecialChar(password)}
+                    text="Special character"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <button

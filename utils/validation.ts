@@ -20,3 +20,20 @@ export const reviewSchema = z.object({
         .min(5, "Review must be at least 5 characters long")
         .max(1000, "Review cannot exceed 1000 characters")
 });
+
+// Auth Schema
+export const passwordRequirements = {
+    minLength: 8,
+    hasUpperCase: (v: string) => /[A-Z]/.test(v),
+    hasLowerCase: (v: string) => /[a-z]/.test(v),
+    hasNumber: (v: string) => /[0-9]/.test(v),
+    hasSpecialChar: (v: string) => /[^A-Za-z0-9]/.test(v),
+};
+
+export const passwordSchema = z.string()
+    .min(passwordRequirements.minLength, `Password must be at least ${passwordRequirements.minLength} characters`)
+    .refine(passwordRequirements.hasUpperCase, "Password must contain at least one uppercase letter")
+    .refine(passwordRequirements.hasLowerCase, "Password must contain at least one lowercase letter")
+    .refine(passwordRequirements.hasNumber, "Password must contain at least one number")
+    .refine(passwordRequirements.hasSpecialChar, "Password must contain at least one special character");
+
