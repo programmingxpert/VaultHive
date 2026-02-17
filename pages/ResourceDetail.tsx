@@ -4,6 +4,7 @@ import { resourcesService } from '../services/resources';
 import { Resource, Privacy, Review } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Download, Star, Calendar, User, BookOpen, Lock, MessageSquare, Send, ArrowLeft, Pencil, Trash2, X } from 'lucide-react';
+import { reviewSchema } from '../utils/validation';
 
 const ResourceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,9 +50,21 @@ const ResourceDetail: React.FC = () => {
 
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
+
+
+  // ...
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !reviewText.trim() || !user || !resource) return;
+    if (!id || !user || !resource) return;
+
+    // Validation
+    const validation = reviewSchema.safeParse({ rating: reviewRating, comment: reviewText });
+    if (!validation.success) {
+      setStatus({ type: 'error', message: validation.error.issues[0].message });
+      return;
+    }
+
     setSubmitting(true);
     setStatus(null);
 

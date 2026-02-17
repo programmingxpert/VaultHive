@@ -6,6 +6,9 @@ import { useAuth } from '../context/AuthContext';
 import { Resource, ResourceType, Privacy } from '../types';
 import { Upload as UploadIcon, File, X, Info, CheckCircle } from 'lucide-react';
 
+import { z } from 'zod';
+import { resourceSchema } from '../utils/validation';
+
 const UploadPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -28,6 +31,7 @@ const UploadPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // If editing, file is optional (keep existing)
   const isEditMode = !!editResource;
@@ -54,7 +58,26 @@ const UploadPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!file && !isEditMode) || !formData.title || !user) return;
+    setErrors({});
+
+    // 1. Validation
+    const result = resourceSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach(err => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    // File validation
+    if (!file && !isEditMode) {
+      setErrors(prev => ({ ...prev, file: "Please upload a file." }));
+      return;
+    }
+
+    if (!user) return;
 
     setLoading(true);
     try {
@@ -105,48 +128,52 @@ const UploadPage: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Resource Title</label>
               <input
-                required
+
                 type="text"
                 placeholder="e.g. Operating Systems Final Exam Solutions"
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                className={`w-full p-4 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none ${errors.title ? 'border-rose-500 bg-rose-50' : 'border-slate-200'}`}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               />
+              {errors.title && <p className="text-xs text-rose-600 font-bold">{errors.title}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Subject</label>
                 <input
-                  required
+
                   type="text"
                   placeholder="e.g. Computer Science"
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className={`w-full p-4 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none ${errors.subject ? 'border-rose-500 bg-rose-50' : 'border-slate-200'}`}
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 />
+                {errors.subject && <p className="text-xs text-rose-600 font-bold">{errors.subject}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Year / Batch</label>
                 <input
-                  required
+
                   type="text"
                   placeholder="e.g. 2024"
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className={`w-full p-4 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none ${errors.year ? 'border-rose-500 bg-rose-50' : 'border-slate-200'}`}
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                 />
+                {errors.year && <p className="text-xs text-rose-600 font-bold">{errors.year}</p>}
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Description</label>
               <textarea
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none min-h-[120px]"
+                className={`w-full p-4 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none min-h-[120px] ${errors.description ? 'border-rose-500 bg-rose-50' : 'border-slate-200'}`}
                 placeholder="Describe what's inside this resource..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
+              {errors.description && <p className="text-xs text-rose-600 font-bold">{errors.description}</p>}
             </div>
 
             <div className="space-y-2">
@@ -161,11 +188,12 @@ const UploadPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="e.g. Exams, Networking, OS"
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                className={`w-full p-4 bg-slate-50 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none ${errors.tags ? 'border-rose-500 bg-rose-50' : 'border-slate-200'}`}
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={addTag}
               />
+              {errors.tags && <p className="text-xs text-rose-600 font-bold">{errors.tags}</p>}
             </div>
           </div>
         </div>
@@ -177,7 +205,7 @@ const UploadPage: React.FC = () => {
               <label className="text-sm font-bold text-slate-700">File Upload {isEditMode && '(Optional)'}</label>
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className={`relative h-48 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all ${file ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 hover:border-indigo-400'
+                className={`relative h-48 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all ${errors.file ? 'border-rose-500 bg-rose-50' : file ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 hover:border-indigo-400'
                   }`}
               >
                 <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
@@ -202,6 +230,7 @@ const UploadPage: React.FC = () => {
                   </>
                 )}
               </div>
+              {errors.file && <p className="text-xs text-rose-600 font-bold text-center">{errors.file}</p>}
             </div>
 
             <div className="space-y-3">
