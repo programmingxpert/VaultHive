@@ -236,35 +236,13 @@ export const resourcesService = {
     },
 
     getResourceById: async (id: string) => {
-        // Fetch resource and its reviews
         const { data, error } = await supabase
             .from('resources')
-            .select(`
-                *,
-                reviews (
-                    id,
-                    user_id,
-                    user_name,
-                    user_avatar,
-                    rating,
-                    comment,
-                    created_at
-                )
-            `)
+            .select('*')
             .eq('id', id)
             .single();
 
         if (error) throw error;
-
-        const reviews = (data.reviews || []).map((r: any) => ({
-            id: r.id,
-            userId: r.user_id,
-            userName: r.user_name,
-            userAvatar: r.user_avatar,
-            rating: r.rating,
-            comment: r.comment,
-            createdAt: new Date(r.created_at).toLocaleDateString()
-        }));
 
         return {
             ...data,
@@ -276,14 +254,40 @@ export const resourcesService = {
             fileSize: data.file_size,
             uploadDate: data.upload_date,
             averageRating: data.average_rating,
-            reviews: reviews
+            reviews: [] // Reviews will be fetched separately
         } as Resource;
+    },
+
+    getReviews: async (resourceId: string) => {
+        console.log('Fetching reviews for:', resourceId);
+        const { data, error } = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('resource_id', resourceId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching reviews:', error);
+            throw error;
+        }
+
+        console.log('Reviews fetched:', data);
+
+        return data.map((r: any) => ({
+            id: r.id,
+            userId: r.user_id,
+            userName: r.user_name,
+            userAvatar: r.user_avatar,
+            rating: r.rating,
+            comment: r.comment,
+            createdAt: new Date(r.created_at).toLocaleDateString()
+        }));
     },
 
     addReview: async (resourceId: string, review: { userId: string, userName: string, userAvatar?: string, rating: number, comment: string }) => {
         const { data, error } = await supabase
             .from('reviews')
-            .insert([
+            .upsert([
                 {
                     resource_id: resourceId,
                     user_id: review.userId,
@@ -292,7 +296,7 @@ export const resourcesService = {
                     rating: review.rating,
                     comment: review.comment
                 }
-            ])
+            ], { onConflict: 'resource_id, user_id' })
             .select()
             .single();
 
@@ -307,5 +311,14 @@ export const resourcesService = {
             comment: data.comment,
             createdAt: new Date(data.created_at).toLocaleDateString()
         };
+    },
+
+    deleteReview: async (reviewId: string) => {
+        const { error } = await supabase
+            .from('reviews')
+            .delete()
+            .eq('id', reviewId);
+
+        if (error) throw error;
     }
 };

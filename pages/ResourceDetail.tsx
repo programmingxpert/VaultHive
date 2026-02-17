@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { resourcesService } from '../services/resources';
 import { Resource, Privacy, Review } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { FileText, Download, Star, Calendar, User, BookOpen, Lock, MessageSquare, Send, ArrowLeft } from 'lucide-react';
+import { FileText, Download, Star, Calendar, User, BookOpen, Lock, MessageSquare, Send, ArrowLeft, Pencil, Trash2, X } from 'lucide-react';
 
 const ResourceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,9 +20,14 @@ const ResourceDetail: React.FC = () => {
       if (!id) return;
       try {
         const data = await resourcesService.getResourceById(id);
-        if (data) setResource(data);
+        if (data) {
+          setResource(data);
+          // Fetch reviews separately
+          const reviews = await resourcesService.getReviews(id);
+          setResource(prev => prev ? ({ ...prev, reviews }) : null);
+        }
       } catch (err) {
-        console.error(err);
+        console.error('Error loading resource:', err);
       } finally {
         setLoading(false);
       }
@@ -42,32 +47,38 @@ const ResourceDetail: React.FC = () => {
   // I'll stick to local state update for now to avoid scope creep, or just comment it out.
   // Wait, I should probably implement `addReview` in service for completeness if I have time, but sticking to requested scope first.
 
+  const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id || !reviewText.trim() || !user || !resource) return;
     setSubmitting(true);
-
-    // Create new review object
-    const newReview: Review = {
-      id: Date.now().toString(),
-      userId: user.id,
-      userName: user.name,
-      rating: reviewRating,
-      comment: reviewText,
-      createdAt: new Date().toLocaleDateString()
-    };
+    setStatus(null);
 
     try {
-      // Optimistic update
-      const updatedReviews = [newReview, ...resource.reviews];
+      const newReview = await resourcesService.addReview(id, {
+        userId: user.id,
+        userName: user.name,
+        userAvatar: user.profilePicture,
+        rating: reviewRating,
+        comment: reviewText
+      });
+
+      // Update state: Remove old review by this user if exists, then add new one
+      const otherReviews = resource.reviews.filter(r => r.userId !== user.id);
+      const updatedReviews = [newReview, ...otherReviews];
+
       setResource({ ...resource, reviews: updatedReviews });
 
-      // TODO: Save to Supabase (update resources table reviews column)
-      // await resourcesService.addReview(id, newReview); 
-
       setReviewText('');
-    } catch (err) {
+      setStatus({ type: 'success', message: 'Review posted successfully!' });
+
+      // Clear success message
+      setTimeout(() => setStatus(null), 3000);
+
+    } catch (err: any) {
       console.error(err);
+      setStatus({ type: 'error', message: 'Failed to submit review: ' + (err.message || 'Unknown error') });
     } finally {
       setSubmitting(false);
     }
@@ -90,6 +101,9 @@ const ResourceDetail: React.FC = () => {
       </div>
     );
   }
+
+  // Check if user has already reviewed to pre-fill (optional UX improvement, for now just handling submission)
+  // We could implement useEffect to setReviewText/Rating if user review exists in resource.reviews
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -128,7 +142,7 @@ const ResourceDetail: React.FC = () => {
               <div className="space-y-1">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Rating</p>
                 <div className="flex items-center gap-1 font-semibold text-amber-500">
-                  <Star className="w-4 h-4 fill-current" /> {resource.averageRating}
+                  <Star className="w-4 h-4 fill-current" /> {resource.averageRating ? Number(resource.averageRating).toFixed(1) : 'N/A'}
                 </div>
               </div>
             </div>
@@ -142,7 +156,9 @@ const ResourceDetail: React.FC = () => {
 
             {user && (
               <form onSubmit={handleSubmitReview} className="mb-10 p-6 bg-slate-50 rounded-2xl">
-                <label className="block text-sm font-bold text-slate-700 mb-3">Add a Review</label>
+                <label className="block text-sm font-bold text-slate-700 mb-3">
+                  {resource.reviews.some(r => r.userId === user.id) ? 'Edit Your Review' : 'Add a Review'}
+                </label>
                 <div className="flex items-center gap-2 mb-4">
                   {[1, 2, 3, 4, 5].map(star => (
                     <button
@@ -162,18 +178,25 @@ const ResourceDetail: React.FC = () => {
                   onChange={(e) => setReviewText(e.target.value)}
                   required
                 />
+
+                {status && (
+                  <div className={`mb-4 p-3 rounded-lg text-sm font-bold ${status.type === 'success' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                    {status.message}
+                  </div>
+                )}
+
                 <button
                   disabled={submitting}
                   className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 disabled:opacity-50"
                 >
-                  {submitting ? 'Posting...' : <><Send className="w-4 h-4" /> Post Review</>}
+                  {submitting ? 'Posting...' : <><Send className="w-4 h-4" /> {resource.reviews.some(r => r.userId === user.id) ? 'Update Review' : 'Post Review'}</>}
                 </button>
               </form>
             )}
 
             <div className="space-y-6">
               {resource.reviews.length > 0 ? resource.reviews.map(review => (
-                <div key={review.id} className="border-b border-slate-100 pb-6 last:border-0">
+                <div key={review.id} className="border-b border-slate-100 pb-6 last:border-0 group">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs overflow-hidden">
@@ -188,10 +211,51 @@ const ResourceDetail: React.FC = () => {
                         <p className="text-xs text-slate-400">{review.createdAt}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-0.5 text-amber-500">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'text-slate-200'}`} />
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-0.5 text-amber-500">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`w-3 h-3 ${i < review.rating ? 'fill-current' : 'text-slate-200'}`} />
+                        ))}
+                      </div>
+                      {user && user.id === review.userId && (
+                        <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => {
+                              setReviewText(review.comment);
+                              setReviewRating(review.rating);
+                              document.querySelector('textarea')?.focus();
+                            }}
+                            className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
+                            title="Edit Review"
+                          >
+                            <FileText className="w-3 h-3" /> {/* Using FileText as Edit icon proxy or import Edit2 */}
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (confirm('Are you sure you want to delete your review?')) {
+                                try {
+                                  await resourcesService.deleteReview(review.id);
+                                  setResource({
+                                    ...resource,
+                                    reviews: resource.reviews.filter(r => r.id !== review.id)
+                                  });
+                                  setStatus({ type: 'success', message: 'Review deleted.' });
+                                  setTimeout(() => setStatus(null), 3000);
+                                  // Reset form if it was matching this review
+                                  setReviewText('');
+                                  setReviewRating(5);
+                                } catch (e) {
+                                  alert('Failed to delete review');
+                                }
+                              }
+                            }}
+                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded"
+                            title="Delete Review"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <p className="text-slate-600 pl-10">{review.comment}</p>
