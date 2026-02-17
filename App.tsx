@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
@@ -12,8 +12,10 @@ import Browse from './pages/Browse';
 import Upload from './pages/Upload';
 import Leaderboard from './pages/Leaderboard';
 import ResourceDetail from './pages/ResourceDetail';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Help from './pages/Help';
 
-// Protected Route Wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -73,6 +75,10 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           } />
 
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/help" element={<Help />} />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -88,9 +94,9 @@ const AppContent: React.FC = () => {
             </div>
             <p className="text-slate-400 text-sm">© 2024 Built by Team Overclocked for Yugastr Hackathon.</p>
             <div className="flex gap-6">
-              <a href="#" className="text-slate-400 hover:text-indigo-600 text-sm font-medium">Privacy</a>
-              <a href="#" className="text-slate-400 hover:text-indigo-600 text-sm font-medium">Terms</a>
-              <a href="#" className="text-slate-400 hover:text-indigo-600 text-sm font-medium">Help</a>
+              <Link to="/privacy" className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm font-medium transition-colors">Privacy</Link>
+              <Link to="/terms" className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm font-medium transition-colors">Terms</Link>
+              <Link to="/help" className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm font-medium transition-colors">Help</Link>
             </div>
           </div>
         </div>
