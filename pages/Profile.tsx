@@ -72,16 +72,16 @@ const Profile: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="text-4xl font-bold text-slate-900 font-display mb-10">Profile Settings</h1>
+      <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display mb-10">Profile Settings</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         <div className="space-y-6">
-          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm text-center">
+          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm text-center">
             <div className="relative inline-block mb-6 group">
-              <img src={user?.profilePicture || '/default_profile.jpg'} alt="Profile" className="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover" />
+              <img src={user?.profilePicture || '/default_profile.jpg'} alt="Profile" className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-700 shadow-xl object-cover" />
               <label
                 htmlFor="avatar-upload"
-                className="absolute bottom-0 right-0 p-2 bg-indigo-600 text-white rounded-full border-2 border-white hover:bg-indigo-700 transition-all cursor-pointer group-hover:scale-110"
+                className="absolute bottom-0 right-0 p-2 bg-indigo-600 text-white rounded-full border-2 border-white dark:border-slate-800 hover:bg-indigo-700 transition-all cursor-pointer group-hover:scale-110 shadow-lg"
               >
                 <Camera className="w-4 h-4" />
               </label>
@@ -94,10 +94,10 @@ const Profile: React.FC = () => {
                 disabled={uploading}
               />
             </div>
-            <h2 className="text-xl font-bold text-slate-900">{user?.name}</h2>
-            <p className="text-sm text-slate-500">{user?.email}</p>
-            <div className="mt-6 pt-6 border-t border-slate-100">
-              <button onClick={logout} className="flex items-center justify-center gap-2 w-full py-3 text-red-600 font-bold hover:bg-red-50 rounded-xl transition-all">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">{user?.name}</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
+            <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+              <button onClick={logout} className="flex items-center justify-center gap-2 w-full py-3 text-red-600 dark:text-red-400 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all">
                 <LogOut className="w-4 h-4" /> Logout
               </button>
             </div>
@@ -105,30 +105,30 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="md:col-span-2">
-          <form onSubmit={handleSubmit} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-8">
+          <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 h-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">Full Name</label>
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Full Name</label>
                 <input
                   type="text"
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white placeholder-slate-400"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">College / Institution</label>
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">College / Institution</label>
                 <input
                   type="text"
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white placeholder-slate-400"
                   value={formData.college}
                   onChange={(e) => setFormData({ ...formData, college: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">Branch / Dept</label>
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Branch / Dept</label>
                 <select
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
                   value={formData.branch}
                   onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
                 >
@@ -151,9 +151,9 @@ const Profile: React.FC = () => {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700">Semester</label>
+                <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Semester</label>
                 <select
-                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
                   value={formData.semester}
                   onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
                 >
@@ -163,9 +163,9 @@ const Profile: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Bio</label>
+              <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Bio</label>
               <textarea
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none min-h-[120px]"
+                className="w-full p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none min-h-[120px] text-slate-900 dark:text-white placeholder-slate-400"
                 placeholder="Tell us about yourself..."
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -173,11 +173,11 @@ const Profile: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between pt-4">
-              {success && <p className="text-emerald-600 font-bold flex items-center gap-1">Changes saved successfully!</p>}
+              {success && <p className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">Changes saved successfully!</p>}
               <button
                 type="submit"
                 disabled={loading}
-                className="ml-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2 disabled:opacity-50"
+                className="ml-auto bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-700 hover:scale-105 transition-all flex items-center gap-2 disabled:opacity-50 shadow-lg shadow-indigo-600/20"
               >
                 {loading ? 'Saving...' : <><Save className="w-5 h-5" /> Save Profile</>}
               </button>

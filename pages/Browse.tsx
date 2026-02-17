@@ -78,16 +78,16 @@ const Browse: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 font-display">Resource Library</h1>
-          {user?.college && <p className="text-slate-500 mt-2">Showing Public resources & Private content from <span className="font-semibold text-indigo-600">{user.college}</span></p>}
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display">Resource Library</h1>
+          {user?.college && <p className="text-slate-500 dark:text-slate-400 mt-2">Showing Public resources & Private content from <span className="font-semibold text-indigo-600 dark:text-indigo-400">{user.college}</span></p>}
         </div>
 
         <div className="relative flex-1 max-w-xl group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors" />
           <input
             type="text"
             placeholder="Search by title, subject or tags..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm"
+            className="w-full pl-12 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:text-white placeholder-slate-400 transition-all shadow-sm"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -95,7 +95,7 @@ const Browse: React.FC = () => {
 
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${showFilters ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 border border-slate-200'}`}
+          className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${showFilters ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
         >
           <Filter className="w-4 h-4" /> Filters
         </button>
@@ -103,12 +103,12 @@ const Browse: React.FC = () => {
 
       {/* Filter Sidebar/Top Bar */}
       {showFilters && (
-        <div className="mb-10 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm animate-in zoom-in-95 duration-200">
+        <div className="mb-10 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm animate-in zoom-in-95 duration-200">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Semester</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Semester</label>
               <select
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                 value={filters.semester}
                 onChange={(e) => setFilters({ ...filters, semester: e.target.value })}
               >
@@ -117,9 +117,9 @@ const Browse: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Resource Type</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resource Type</label>
               <select
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                 value={filters.type}
                 onChange={(e) => setFilters({ ...filters, type: e.target.value })}
               >
@@ -128,9 +128,9 @@ const Browse: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Branch</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Branch</label>
               <select
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white"
                 value={filters.branch}
                 onChange={(e) => setFilters({ ...filters, branch: e.target.value })}
               >
@@ -141,7 +141,7 @@ const Browse: React.FC = () => {
             <div className="flex items-end">
               <button
                 onClick={resetFilters}
-                className="w-full flex items-center justify-center gap-2 text-slate-500 hover:text-indigo-600 font-medium py-2.5"
+                className="w-full flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium py-2.5 transition-colors"
               >
                 <RotateCcw className="w-4 h-4" /> Clear All
               </button>
@@ -154,7 +154,7 @@ const Browse: React.FC = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="h-64 bg-slate-200 rounded-2xl animate-pulse" />
+            <div key={i} className="h-64 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : resources.length > 0 ? (
@@ -164,12 +164,12 @@ const Browse: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-slate-300">
-          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Search className="w-8 h-8 text-slate-400" />
+        <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700">
+          <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Search className="w-8 h-8 text-slate-400 dark:text-slate-500" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900">No resources found</h3>
-          <p className="text-slate-500 mt-2">Try adjusting your filters or search terms.</p>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">No resources found</h3>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Try adjusting your filters or search terms.</p>
         </div>
       )}
     </div>

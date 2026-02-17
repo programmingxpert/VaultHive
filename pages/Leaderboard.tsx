@@ -40,11 +40,11 @@ const Leaderboard: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold text-slate-900 font-display mb-4">Leaderboard</h1>
-                <p className="text-lg text-slate-500 mb-6">Recognizing the top contributors and most active communities.</p>
+                <h1 className="text-4xl font-bold text-slate-900 dark:text-white font-display mb-4">Leaderboard</h1>
+                <p className="text-lg text-slate-500 dark:text-slate-400 mb-6">Recognizing the top contributors and most active communities.</p>
 
-                <div className="inline-block bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
-                    <p className="text-xs font-bold text-amber-700 uppercase tracking-widest flex items-center gap-2">
+                <div className="inline-block bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-lg px-4 py-2">
+                    <p className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest flex items-center gap-2">
                         <TrendingUp className="w-4 h-4" /> Mock Data for Demonstration
                     </p>
                 </div>
@@ -52,16 +52,16 @@ const Leaderboard: React.FC = () => {
 
             {/* Tabs */}
             <div className="flex justify-center mb-10">
-                <div className="bg-slate-100 p-1.5 rounded-xl inline-flex">
+                <div className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl inline-flex">
                     <button
                         onClick={() => setActiveTab('users')}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'users' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'users' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <User className="w-4 h-4" /> Top Contributors
                     </button>
                     <button
                         onClick={() => setActiveTab('colleges')}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'colleges' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'colleges' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                     >
                         <Building2 className="w-4 h-4" /> Top Colleges
                     </button>
@@ -70,80 +70,80 @@ const Leaderboard: React.FC = () => {
 
             {loading ? (
                 <div className="space-y-4 max-w-3xl mx-auto">
-                    {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-20 bg-slate-200 rounded-2xl animate-pulse" />)}
+                    {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-20 bg-slate-200 dark:bg-slate-800 rounded-2xl animate-pulse" />)}
                 </div>
             ) : (
                 <div className="max-w-4xl mx-auto">
                     {activeTab === 'users' ? (
                         <div className="space-y-4">
                             {stats.topUsers.map((user, index) => (
-                                <div key={index} className="bg-white p-6 rounded-2xl border border-slate-200 flex items-center gap-6 hover:shadow-md transition-shadow">
-                                    <div className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-xl ${index === 0 ? 'bg-amber-100 text-amber-600' :
-                                        index === 1 ? 'bg-slate-100 text-slate-600' :
-                                            index === 2 ? 'bg-orange-100 text-orange-600' :
-                                                'bg-slate-50 text-slate-400'
+                                <div key={index} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-6 hover:shadow-md transition-shadow">
+                                    <div className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-xl ${index === 0 ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
+                                        index === 1 ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' :
+                                            index === 2 ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
+                                                'bg-slate-50 text-slate-400 dark:bg-slate-800/50 dark:text-slate-500'
                                         }`}>
                                         {index + 1}
                                     </div>
 
                                     <div className="flex-1 flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-slate-100 overflow-hidden">
+                                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                                             <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} alt={user.name} className="w-full h-full object-cover" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-slate-900 text-lg">{user.name}</h3>
-                                            <p className="text-sm text-slate-500">Top student</p>
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-lg">{user.name}</h3>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">Top student</p>
                                         </div>
                                     </div>
 
                                     <div className="flex gap-8 text-right">
                                         <div className="hidden sm:block">
-                                            <p className="text-xs font-bold text-slate-400 uppercase">Uploads</p>
-                                            <p className="font-bold text-slate-900">{user.uploads}</p>
+                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Uploads</p>
+                                            <p className="font-bold text-slate-900 dark:text-white">{user.uploads}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-slate-400 uppercase">Downloads</p>
-                                            <p className="font-bold text-indigo-600 flex items-center gap-1 justify-end">
+                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Downloads</p>
+                                            <p className="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 justify-end">
                                                 <Download className="w-3 h-3" /> {user.downloads}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            {stats.topUsers.length === 0 && <div className="text-center py-10 text-slate-500">No data available yet.</div>}
+                            {stats.topUsers.length === 0 && <div className="text-center py-10 text-slate-500 dark:text-slate-400">No data available yet.</div>}
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {stats.topColleges.map((college, index) => (
-                                <div key={index} className="bg-white p-6 rounded-2xl border border-slate-200 flex items-center gap-6 hover:shadow-md transition-shadow">
-                                    <div className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-xl ${index === 0 ? 'bg-amber-100 text-amber-600' :
-                                        index === 1 ? 'bg-slate-100 text-slate-600' :
-                                            index === 2 ? 'bg-orange-100 text-orange-600' :
-                                                'bg-slate-50 text-slate-400'
+                                <div key={index} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-6 hover:shadow-md transition-shadow">
+                                    <div className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold text-xl ${index === 0 ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
+                                        index === 1 ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400' :
+                                            index === 2 ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
+                                                'bg-slate-50 text-slate-400 dark:bg-slate-800/50 dark:text-slate-500'
                                         }`}>
                                         {index + 1}
                                     </div>
 
                                     <div className="flex-1">
-                                        <h3 className="font-bold text-slate-900 text-lg">{college.name}</h3>
-                                        <p className="text-sm text-slate-500">Academic Institution</p>
+                                        <h3 className="font-bold text-slate-900 dark:text-white text-lg">{college.name}</h3>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">Academic Institution</p>
                                     </div>
 
                                     <div className="flex gap-8 text-right">
                                         <div className="hidden sm:block">
-                                            <p className="text-xs font-bold text-slate-400 uppercase">Avg Rating</p>
+                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Avg Rating</p>
                                             <p className="font-bold text-amber-500 flex items-center gap-1 justify-end">
                                                 <User className="w-3 h-3" /> {college.avgRating}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-slate-400 uppercase">Resources</p>
-                                            <p className="font-bold text-indigo-600">{college.uploads}</p>
+                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Resources</p>
+                                            <p className="font-bold text-indigo-600 dark:text-indigo-400">{college.uploads}</p>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                            {stats.topColleges.length === 0 && <div className="text-center py-10 text-slate-500">No data available yet.</div>}
+                            {stats.topColleges.length === 0 && <div className="text-center py-10 text-slate-500 dark:text-slate-400">No data available yet.</div>}
                         </div>
                     )}
                 </div>
