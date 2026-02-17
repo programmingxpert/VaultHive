@@ -14,12 +14,17 @@ const Landing: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [resData, leadData] = await Promise.all([
-          api.fetchResources(),
-          api.fetchLeaderboard()
-        ]);
+        const resData = await api.fetchResources();
         setTrending(resData.slice(0, 3));
-        setLeaderboard(leadData);
+
+        // Static Leaderboard Data as requested
+        setLeaderboard([
+          { college: 'Ramaiyah Institute of Technology, Bangalore', uploads: 156, rank: 1 },
+          { college: 'Alliance University, Bangalore', uploads: 142, rank: 2 },
+          { college: 'Christ University, Bangalore', uploads: 128, rank: 3 },
+          { college: 'State Polytechnic, Mumbai', uploads: 95, rank: 4 },
+          { college: 'National Arts College, Kolkata', uploads: 75, rank: 5 }
+        ]);
       } catch (err) {
         console.error(err);
       } finally {
