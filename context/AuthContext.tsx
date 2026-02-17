@@ -39,6 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               college: session.user.user_metadata.college || '',
               branch: session.user.user_metadata.branch || '',
               semester: session.user.user_metadata.semester || '',
+              bio: session.user.user_metadata.bio || '',
+              profilePicture: session.user.user_metadata.avatar_url || '/default_profile.jpg',
               isVerified: session.user.email_confirmed_at ? true : false,
               badges: [],
               stats: {
@@ -75,6 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             college: session.user.user_metadata.college || '',
             branch: session.user.user_metadata.branch || '',
             semester: session.user.user_metadata.semester || '',
+            bio: session.user.user_metadata.bio || '',
+            profilePicture: session.user.user_metadata.avatar_url || '/default_profile.jpg',
             isVerified: session.user.email_confirmed_at ? true : false,
             badges: [],
             stats: {
@@ -125,6 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           college: data.session.user.user_metadata.college || '',
           branch: data.session.user.user_metadata.branch || '',
           semester: data.session.user.user_metadata.semester || '',
+          bio: data.session.user.user_metadata.bio || '',
+          profilePicture: data.session.user.user_metadata.avatar_url || '/default_profile.jpg',
           isVerified: data.session.user.email_confirmed_at ? true : false,
           badges: [],
           stats: {
@@ -172,6 +178,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           college: responseData.session.user.user_metadata.college || '',
           branch: responseData.session.user.user_metadata.branch || '',
           semester: responseData.session.user.user_metadata.semester || '',
+          bio: responseData.session.user.user_metadata.bio || '',
+          profilePicture: responseData.session.user.user_metadata.avatar_url || '/default_profile.jpg',
           isVerified: responseData.session.user.email_confirmed_at ? true : false,
           badges: [],
           stats: {

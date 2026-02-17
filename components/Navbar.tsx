@@ -24,7 +24,7 @@ const Navbar: React.FC = () => {
                 <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
               </div>
               <span className="font-display text-xl font-bold tracking-tight text-slate-900">
-                Neural <span className="text-indigo-600">Breach</span>
+                Vault<span className="text-indigo-600">Hive</span>
               </span>
             </Link>
           </div>
@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
             <Link to="/browse" className="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
               <Search className="w-4 h-4" /> Browse
             </Link>
-            
+
             {isAuthenticated ? (
               <>
                 <Link to="/upload" className="bg-indigo-600 text-white hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1 transition-all">
