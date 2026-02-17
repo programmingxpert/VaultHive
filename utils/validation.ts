@@ -37,3 +37,9 @@ export const passwordSchema = z.string()
     .refine(passwordRequirements.hasNumber, "Password must contain at least one number")
     .refine(passwordRequirements.hasSpecialChar, "Password must contain at least one special character");
 
+export const registerSchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    password: passwordSchema,
+    college: z.string().min(2, "College name is required"),
+});

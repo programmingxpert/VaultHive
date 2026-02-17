@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState } from '../types';
 import { supabase } from '../services/supabase';
-import { passwordSchema } from '../utils/validation';
+import { registerSchema } from '../utils/validation';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -152,8 +152,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (data: any) => {
-    // Validate password again for safety
-    const result = passwordSchema.safeParse(data.password);
+    // Validate data again for safety
+    const result = registerSchema.safeParse({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      college: data.college
+    });
+
     if (!result.success) {
       throw new Error(result.error.issues[0].message);
     }

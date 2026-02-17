@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Mail, Lock, User, GraduationCap, ArrowRight, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
-import { passwordSchema, passwordRequirements } from '../utils/validation';
+import { passwordSchema, passwordRequirements, registerSchema } from '../utils/validation';
 
 const RequirementItem: React.FC<{ met: boolean; text: string }> = ({ met, text }) => (
   <div className={`flex items-center gap-2 text-[11px] sm:text-sm transition-all duration-300 ${met ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-400 dark:text-slate-500'}`}>
@@ -31,28 +31,20 @@ const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const getFriendlyErrorMessage = (error: any) => {
-    const message = error.message || String(error);
-
-    if (message.includes('Invalid login credentials')) {
+  const getFriendlyErrorMessage = (message: string) => {
+    const msg = message.toLowerCase();
+    if (msg.includes('invalid login credentials')) {
       return 'Incorrect email or password. Please try again.';
     }
-    if (message.includes('User already registered')) {
-      return 'An account with this email already exists. Try logging in instead.';
+    if (msg.includes('user already registered')) {
+      return 'An account with this email already exists.';
     }
-    if (message.includes('Email not confirmed')) {
-      return 'Please verify your email address. Check your inbox for a confirmation link.';
+    if (msg.includes('email not confirmed')) {
+      return 'Please verify your email address before logging in.';
     }
-    if (message.includes('rate limit')) {
-      return 'Too many attempts. Please try again later.';
+    if (msg.includes('network error')) {
+      return 'Connection lost. Please check your internet and try again.';
     }
-    if (message.includes('Unable to validate email')) {
-      return 'The email address provided is invalid.';
-    }
-    if (message.includes('Database error') || message.includes('fetch')) {
-      return 'Server is busy. Please try again in a few moments.';
-    }
-
     return message;
   };
 
@@ -62,9 +54,20 @@ const Auth: React.FC = () => {
     setError('');
 
     if (!isLogin) {
-      const result = passwordSchema.safeParse(password);
+      const result = registerSchema.safeParse({ name, email, password, college });
       if (!result.success) {
         setError(result.error.issues[0].message);
+        setLoading(false);
+        return;
+      }
+    } else {
+      if (!email.includes('@')) {
+        setError('Please enter a valid email address.');
+        setLoading(false);
+        return;
+      }
+      if (!password) {
+        setError('Please enter your password.');
         setLoading(false);
         return;
       }
@@ -78,7 +81,7 @@ const Auth: React.FC = () => {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      setError(getFriendlyErrorMessage(err));
+      setError(getFriendlyErrorMessage(err.message || 'Authentication failed. Please check your credentials.'));
     } finally {
       setLoading(false);
     }
@@ -105,9 +108,9 @@ const Auth: React.FC = () => {
 
         <form className="mt-8 space-y-4 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-800 transition-colors" onSubmit={handleSubmit}>
           {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 text-sm font-medium rounded-2xl mb-6 border border-red-100 dark:border-red-900/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              <span>{error}</span>
+            <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-bold rounded-2xl mb-6 border border-red-100 dark:border-red-900/30 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p>{error}</p>
             </div>
           )}
 
