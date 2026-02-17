@@ -1,20 +1,77 @@
-# VaultHive – Yugastr 2026 (by Team Overclocked)
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" alt="VaultHive Banner" width="100%" />
+
+  # VaultHive 
+  ### Built for Neural Breach Hackathon @ MS Ramaiah College
+  
+  **Team Overclocked | Alliance University**
 </div>
 
-# Run and deploy your AI Studio app
+---
 
-This contains everything you need to run your app locally.
+## 🚀 About The Project
+**VaultHive** is a decentralized, community-driven resource sharing platform designed specifically for college students. Built during the **Neural Breach Hackathon** at MS Ramaiah College, it aims to solve the fragmentation of study materials by providing a centralized, high-quality repository for notes, previous year question papers, and project ideas.
 
-View your app in AI Studio: https://ai.studio/apps/drive/16KsCeml8R1v7yR8F42PO_R_jlSgSk4wo
+### 🌟 Key Features
+- **Secure Authentication**: Robust email/password login system powered by **Supabase Auth**.
+- **Resource Management**: 
+  - **Upload**: Share PDFs, Images, and Documents easily.
+  - **Metadata**: Tag resources by Subject, Semester, and Branch for easy discovery.
+  - **Edit & Delete**: Full control over your uploaded content.
+- **Smart Storage**: Files are securely stored in **Supabase Storage** with Row Level Security (RLS) policies ensuring data privacy.
+- **User Profiles**: 
+  - Customizable profiles with **Avatar Uploads**.
+  - Track your contributions and reputation.
+- **Modern UI/UX**: A stunning, responsive interface built with **React**, **Tailwind CSS**, and **Framer Motion** for smooth interactions.
 
-## Run Locally
+---
 
-**Prerequisites:**  Node.js
+## 👥 The Team: Overclocked
+Representing **Alliance University**, we are a team of passionate developers:
 
+- **Satyasundar Behera** 
+- **Nehan Azeem P N**
+- **Nidhi Mallikarjun**
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+
+## 🛠️ Tech Stack
+- **Frontend**: React (TypeScript), Vite
+- **Styling**: Tailwind CSS, Lucide React (Icons)
+- **Backend & Database**: Supabase (PostgreSQL)
+- **Storage**: Supabase Storage
+- **Routing**: React Router DOM
+
+---
+
+## ⚡ Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/programmingxpert/VaultHive.git
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up Environment Variables:
+   Create a `.env.local` file and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+<div align="center">
+  Built with ❤️ by Team Overclocked for Neural Breach 2026
+</div>
