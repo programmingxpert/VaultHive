@@ -31,6 +31,31 @@ const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const getFriendlyErrorMessage = (error: any) => {
+    const message = error.message || String(error);
+
+    if (message.includes('Invalid login credentials')) {
+      return 'Incorrect email or password. Please try again.';
+    }
+    if (message.includes('User already registered')) {
+      return 'An account with this email already exists. Try logging in instead.';
+    }
+    if (message.includes('Email not confirmed')) {
+      return 'Please verify your email address. Check your inbox for a confirmation link.';
+    }
+    if (message.includes('rate limit')) {
+      return 'Too many attempts. Please try again later.';
+    }
+    if (message.includes('Unable to validate email')) {
+      return 'The email address provided is invalid.';
+    }
+    if (message.includes('Database error') || message.includes('fetch')) {
+      return 'Server is busy. Please try again in a few moments.';
+    }
+
+    return message;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -53,7 +78,7 @@ const Auth: React.FC = () => {
       }
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please check your credentials.');
+      setError(getFriendlyErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -79,7 +104,12 @@ const Auth: React.FC = () => {
         </div>
 
         <form className="mt-8 space-y-4 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl shadow-slate-200 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-800 transition-colors" onSubmit={handleSubmit}>
-          {error && <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-bold rounded-lg mb-4 border border-red-100 dark:border-red-900/30">{error}</div>}
+          {error && (
+            <div className="p-4 bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 text-sm font-medium rounded-2xl mb-6 border border-red-100 dark:border-red-900/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
 
           <div className="space-y-4">
             {!isLogin && (
