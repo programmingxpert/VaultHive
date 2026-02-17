@@ -5,6 +5,7 @@ import { Resource } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { Book, BarChart3, Star, Download, Edit, Trash2, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { formatDate, formatFileSize } from '../utils/format';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -105,9 +106,12 @@ const Dashboard: React.FC = () => {
                 <tr key={res.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-6">
                     <p className="font-bold text-slate-900">{res.title}</p>
-                    <p className="text-xs text-slate-500">{res.subject}</p>
+                    <p className="text-xs text-slate-500 mb-1">{res.subject}</p>
+                    <span className="text-xs font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{formatFileSize(res.fileSize)}</span>
                   </td>
-                  <td className="px-6 py-6 text-sm text-slate-500">{res.uploadDate}</td>
+
+
+                  <td className="px-6 py-6 text-sm text-slate-500">{formatDate(res.uploadDate)}</td>
                   <td className="px-6 py-6">
                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${res.privacy === 'Public' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                       {res.privacy}

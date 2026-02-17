@@ -5,6 +5,7 @@ import { Resource, Privacy, Review } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Download, Star, Calendar, User, BookOpen, Lock, MessageSquare, Send, ArrowLeft, Pencil, Trash2, X } from 'lucide-react';
 import { reviewSchema } from '../utils/validation';
+import { formatFileSize } from '../utils/format';
 
 const ResourceDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -295,9 +296,11 @@ const ResourceDetail: React.FC = () => {
                 <span className="text-slate-400">File Name</span>
                 <span className="font-semibold text-slate-700 truncate max-w-[150px]">{resource.fileName}</span>
               </div>
+
+
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400">File Size</span>
-                <span className="font-semibold text-slate-700">{resource.fileSize}</span>
+                <span className="font-semibold text-slate-700">{formatFileSize(resource.fileSize)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-slate-400">Downloads</span>

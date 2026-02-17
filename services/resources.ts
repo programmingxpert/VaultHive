@@ -320,5 +320,70 @@ export const resourcesService = {
             .eq('id', reviewId);
 
         if (error) throw error;
+    },
+
+    getLeaderboardStats: async () => {
+        // Fetch all resources to aggregate stats
+        // In a real app, this should be an RPC call or a materialized view
+        const { data, error } = await supabase
+            .from('resources')
+            .select('id, uploader_id, uploader_name, uploader_avatar, college, downloads, rating_average');
+
+        if (error) throw error;
+
+        // Aggregate by User
+        const userStats: Record<string, { id: string; name: string; avatar: string; uploads: number; downloads: number; avgRating: number; totalRating: number }> = {};
+
+        // Aggregate by College
+        const collegeStats: Record<string, { name: string; uploads: number; downloads: number; avgRating: number; totalRating: number }> = {};
+
+        data.forEach(res => {
+            // User Stats
+            if (res.uploader_id) {
+                if (!userStats[res.uploader_id]) {
+                    userStats[res.uploader_id] = {
+                        id: res.uploader_id,
+                        name: res.uploader_name || 'Unknown',
+                        avatar: res.uploader_avatar,
+                        uploads: 0,
+                        downloads: 0,
+                        avgRating: 0,
+                        totalRating: 0
+                    };
+                }
+                userStats[res.uploader_id].uploads += 1;
+                userStats[res.uploader_id].downloads += (res.downloads || 0);
+                userStats[res.uploader_id].totalRating += (res.rating_average || 0);
+            }
+
+            // College Stats
+            if (res.college) {
+                if (!collegeStats[res.college]) {
+                    collegeStats[res.college] = {
+                        name: res.college,
+                        uploads: 0,
+                        downloads: 0,
+                        avgRating: 0,
+                        totalRating: 0
+                    };
+                }
+                collegeStats[res.college].uploads += 1;
+                collegeStats[res.college].downloads += (res.downloads || 0);
+                collegeStats[res.college].totalRating += (res.rating_average || 0);
+            }
+        });
+
+        // Calculate Averages and Sort
+        const topUsers = Object.values(userStats).map(u => ({
+            ...u,
+            avgRating: u.uploads > 0 ? (u.totalRating / u.uploads).toFixed(1) : '0.0'
+        })).sort((a, b) => b.downloads - a.downloads).slice(0, 10); // Top 10 by downloads
+
+        const topColleges = Object.values(collegeStats).map(c => ({
+            ...c,
+            avgRating: c.uploads > 0 ? (c.totalRating / c.uploads).toFixed(1) : '0.0'
+        })).sort((a, b) => b.uploads - a.uploads).slice(0, 10); // Top 10 by uploads
+
+        return { topUsers, topColleges };
     }
 };

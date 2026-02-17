@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Browse from './pages/Browse';
 import Upload from './pages/Upload';
+import Leaderboard from './pages/Leaderboard';
 import ResourceDetail from './pages/ResourceDetail';
 
 // Protected Route Wrapper
@@ -52,6 +53,7 @@ const AppContent: React.FC = () => {
             </PublicOnlyRoute>
           } />
           <Route path="/browse" element={<Browse />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/resource/:id" element={<ResourceDetail />} />
 
           <Route path="/profile" element={

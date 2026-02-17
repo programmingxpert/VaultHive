@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, LogOut, User as UserIcon, Upload, Search, BookOpen } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Upload, Search, BookOpen, Trophy } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -33,6 +33,9 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/browse" className="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
               <Search className="w-4 h-4" /> Browse
+            </Link>
+            <Link to="/leaderboard" className="text-slate-600 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
+              <Trophy className="w-4 h-4" /> Leaderboard
             </Link>
 
             {isAuthenticated ? (
