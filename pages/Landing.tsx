@@ -81,8 +81,8 @@ const Landing: React.FC = () => {
 
   const team = [
     { name: 'Satyasundar B', role: 'Lead Developer' },
-    { name: 'Nehan Azeem P N', role: 'UI/UX Designer' },
-    { name: 'Nidhi Mallikarjun', role: 'Full Stack Engineer' }
+    { name: 'Nehan Azeem P N', role: 'Testing/Research/Resource' },
+    { name: 'Nidhi Mallikarjun', role: 'Presentation' }
   ];
 
   return (
